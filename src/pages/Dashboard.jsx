@@ -1,3 +1,5 @@
+import { useTasks } from "../context/TaskContext";
+
 import {
   CheckCircle2,
   Clock3,
@@ -7,69 +9,69 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 
-const stats = [
-  {
-    title: "Total Tasks",
-    value: "24",
-    change: "+12%",
-    description: "from last month",
-    icon: ListTodo,
-  },
-  {
-    title: "In Progress",
-    value: "08",
-    change: "+5%",
-    description: "from last month",
-    icon: Clock3,
-  },
-  {
-    title: "Completed",
-    value: "13",
-    change: "+18%",
-    description: "from last month",
-    icon: CheckCircle2,
-  },
-  {
-    title: "Overdue",
-    value: "03",
-    change: "-8%",
-    description: "from last month",
-    icon: AlertCircle,
-  },
-];
 
-const recentTasks = [
-  {
-    title: "Build portfolio website",
-    project: "Personal Portfolio",
-    priority: "High",
-    status: "In Progress",
-    dueDate: "Sep 08, 2026",
-  },
-  {
-    title: "Complete React authentication",
-    project: "TaskFlow",
-    priority: "High",
-    status: "In Progress",
-    dueDate: "Sep 10, 2026",
-  },
-  {
-    title: "Design dashboard components",
-    project: "TaskFlow",
-    priority: "Medium",
-    status: "Completed",
-    dueDate: "Sep 05, 2026",
-  },
-  {
-    title: "Write project documentation",
-    project: "TaskFlow",
-    priority: "Low",
-    status: "Todo",
-    dueDate: "Sep 12, 2026",
-  },
-];
 
 function Dashboard() {
+  const { tasks, completeTask } = useTasks();
+  const totalTasks = tasks.length;
+
+  const completedTasks = tasks.filter(
+    (task) => task.status === "Completed"
+  ).length;
+
+  const inProgressTasks = tasks.filter(
+    (task) => task.status === "In Progress"
+  ).length;
+
+  const todoTasks = tasks.filter(
+    (task) => task.status === "Todo"
+  ).length;
+
+  const recentTasks = tasks.slice(0, 4);
+
+  const overdueTasks = tasks.filter((task) => {
+    if (
+      !task.dueDate ||
+      task.dueDate === "No due date" ||
+      task.status === "Completed"
+    ) {
+      return false;
+    }
+
+    const dueDate = new Date(task.dueDate);
+    const today = new Date();
+
+    today.setHours(0, 0, 0, 0);
+    dueDate.setHours(0, 0, 0, 0);
+
+    return dueDate < today;
+  }).length;
+  const stats = [
+    {
+      title: "Total Tasks",
+      value: totalTasks,
+      description: "all tasks",
+      icon: ListTodo,
+    },
+    {
+      title: "In Progress",
+      value: inProgressTasks,
+      description: "active tasks",
+      icon: Clock3,
+    },
+    {
+      title: "Completed",
+      value: completedTasks,
+      description: "finished tasks",
+      icon: CheckCircle2,
+    },
+    {
+      title: "Overdue",
+      value: overdueTasks,
+      description: "past due tasks",
+      icon: AlertCircle,
+    },
+  ];
   return (
     <div className="space-y-8">
 
@@ -125,8 +127,8 @@ function Dashboard() {
                   {stat.value}
                 </h2>
 
-                <span className="mb-1 text-xs font-medium text-emerald-400">
-                  {stat.change}
+                <span className="mb-1 text-xs font-medium text-slate-500">
+                  live
                 </span>
               </div>
 
@@ -163,32 +165,51 @@ function Dashboard() {
             </span>
 
             <span className="font-semibold text-white">
-              72%
+              {totalTasks > 0
+                ? Math.round((completedTasks / totalTasks) * 100)
+                : 0}%
             </span>
           </div>
 
           <div className="mt-3 h-3 overflow-hidden rounded-full bg-slate-800">
-            <div className="h-full w-[72%] rounded-full bg-blue-600" />
+            <div
+              className="h-full rounded-full bg-blue-600"
+              style={{
+                width: `${totalTasks > 0
+                  ? Math.round((completedTasks / totalTasks) * 100)
+                  : 0
+                  }%`,
+              }}
+            />
           </div>
         </div>
 
         <div className="mt-6 grid grid-cols-3 gap-4 border-t border-slate-800 pt-6">
           <div>
-            <p className="text-2xl font-bold text-white">18</p>
+            <p className="text-2xl font-bold text-white">
+              {completedTasks}
+            </p>
+
             <p className="mt-1 text-xs text-slate-500">
               Completed
             </p>
           </div>
 
           <div>
-            <p className="text-2xl font-bold text-white">6</p>
+            <p className="text-2xl font-bold text-white">
+              {inProgressTasks}
+            </p>
+
             <p className="mt-1 text-xs text-slate-500">
               In Progress
             </p>
           </div>
 
           <div>
-            <p className="text-2xl font-bold text-white">2</p>
+            <p className="text-2xl font-bold text-white">
+              {todoTasks}
+            </p>
+
             <p className="mt-1 text-xs text-slate-500">
               Remaining
             </p>
@@ -218,7 +239,7 @@ function Dashboard() {
         <div className="divide-y divide-slate-800">
           {recentTasks.map((task) => (
             <div
-              key={task.title}
+              key={task.id}
               className="flex flex-col gap-4 p-5 transition hover:bg-slate-900/50 md:flex-row md:items-center md:justify-between"
             >
               <div className="flex items-start gap-4">
@@ -238,25 +259,23 @@ function Dashboard() {
               <div className="flex flex-wrap items-center gap-4 md:justify-end">
 
                 <span
-                  className={`rounded-full px-3 py-1 text-xs font-medium ${
-                    task.priority === "High"
-                      ? "bg-red-500/10 text-red-400"
-                      : task.priority === "Medium"
+                  className={`rounded-full px-3 py-1 text-xs font-medium ${task.priority === "High"
+                    ? "bg-red-500/10 text-red-400"
+                    : task.priority === "Medium"
                       ? "bg-yellow-500/10 text-yellow-400"
                       : "bg-slate-800 text-slate-400"
-                  }`}
+                    }`}
                 >
                   {task.priority}
                 </span>
 
                 <span
-                  className={`rounded-full px-3 py-1 text-xs font-medium ${
-                    task.status === "Completed"
-                      ? "bg-emerald-500/10 text-emerald-400"
-                      : task.status === "In Progress"
+                  className={`rounded-full px-3 py-1 text-xs font-medium ${task.status === "Completed"
+                    ? "bg-emerald-500/10 text-emerald-400"
+                    : task.status === "In Progress"
                       ? "bg-blue-500/10 text-blue-400"
                       : "bg-slate-800 text-slate-400"
-                  }`}
+                    }`}
                 >
                   {task.status}
                 </span>
@@ -265,7 +284,24 @@ function Dashboard() {
                   {task.dueDate}
                 </span>
 
-                <button className="text-slate-500 hover:text-white">
+                <button
+                  onClick={() => completeTask(task.id)}
+                  disabled={task.status === "Completed"}
+                  aria-label={
+                    task.status === "Completed"
+                      ? "Task completed"
+                      : "Mark task as completed"
+                  }
+                  title={
+                    task.status === "Completed"
+                      ? "Task completed"
+                      : "Mark as completed"
+                  }
+                  className={`text-slate-500 transition ${task.status === "Completed"
+                      ? "cursor-not-allowed opacity-40"
+                      : "hover:text-emerald-400"
+                    }`}
+                >
                   <MoreHorizontal size={19} />
                 </button>
               </div>

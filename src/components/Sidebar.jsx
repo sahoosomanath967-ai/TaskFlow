@@ -49,7 +49,7 @@ const bottomItems = [
 function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 flex h-screen w-64 flex-col border-r border-slate-800 bg-slate-950 text-white">
-      
+
       {/* Logo */}
       <div className="flex h-20 items-center border-b border-slate-800 px-6">
         <div>
@@ -65,7 +65,7 @@ function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 px-4 py-6">
-        
+
         {/* Workspace */}
         <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
           Workspace
@@ -80,10 +80,9 @@ function Sidebar() {
                 key={item.name}
                 to={item.path}
                 className={({ isActive }) =>
-                  `flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition ${
-                    isActive
-                      ? "bg-blue-600 text-white"
-                      : "text-slate-400 hover:bg-slate-900 hover:text-white"
+                  `flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition ${isActive
+                    ? "bg-blue-500/10 text-blue-400 ring-1 ring-inset ring-blue-500/20"
+                    : "text-slate-400 hover:bg-slate-900 hover:text-white"
                   }`
                 }
               >
@@ -108,10 +107,9 @@ function Sidebar() {
                 key={item.name}
                 to={item.path}
                 className={({ isActive }) =>
-                  `flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition ${
-                    isActive
-                      ? "bg-blue-600 text-white"
-                      : "text-slate-400 hover:bg-slate-900 hover:text-white"
+                  `flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition ${isActive
+                    ? "bg-blue-500/10 text-blue-400 ring-1 ring-inset ring-blue-500/20"
+                    : "text-slate-400 hover:bg-slate-900 hover:text-white"
                   }`
                 }
               >

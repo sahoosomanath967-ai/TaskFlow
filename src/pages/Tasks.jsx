@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+import { useTasks } from "../context/TaskContext";
 import CreateTaskModal from "../components/CreateTaskModal";
 import TaskDetailsModal from "../components/TaskDetailsModal";
-
 import {
   Plus,
   Search,
@@ -10,59 +10,16 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-const initialTasks = [
-  {
-    id: 1,
-    title: "Build portfolio website",
-    project: "Personal Portfolio",
-    priority: "High",
-    status: "In Progress",
-    dueDate: "Sep 08, 2026",
-  },
-  {
-    id: 2,
-    title: "Complete React authentication",
-    project: "TaskFlow",
-    priority: "High",
-    status: "In Progress",
-    dueDate: "Sep 10, 2026",
-  },
-  {
-    id: 3,
-    title: "Design dashboard components",
-    project: "TaskFlow",
-    priority: "Medium",
-    status: "Completed",
-    dueDate: "Sep 05, 2026",
-  },
-  {
-    id: 4,
-    title: "Write project documentation",
-    project: "TaskFlow",
-    priority: "Low",
-    status: "Todo",
-    dueDate: "Sep 12, 2026",
-  },
-  {
-    id: 5,
-    title: "Create MongoDB database",
-    project: "TaskFlow",
-    priority: "High",
-    status: "Todo",
-    dueDate: "Sep 14, 2026",
-  },
-  {
-    id: 6,
-    title: "Build REST API",
-    project: "TaskFlow",
-    priority: "Medium",
-    status: "Todo",
-    dueDate: "Sep 16, 2026",
-  },
-];
 
 function Tasks() {
-  const [tasks, setTasks] = useState(initialTasks);
+  const {
+    tasks,
+    addTask,
+    updateTask,
+    deleteTask,
+    completeTask,
+  } = useTasks();
+
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
 
@@ -278,13 +235,7 @@ function Tasks() {
                         return;
                       }
 
-                      setTasks((prevTasks) =>
-                        prevTasks.map((item) =>
-                          item.id === task.id
-                            ? { ...item, status: "Completed" }
-                            : item
-                        )
-                      );
+                      completeTask(task.id);
                     }}
                     className={`mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition ${task.status === "Completed"
                       ? "bg-emerald-500/10 text-emerald-400"
@@ -350,13 +301,7 @@ function Tasks() {
                     onChange={(e) => {
                       const newStatus = e.target.value;
 
-                      setTasks((prevTasks) =>
-                        prevTasks.map((item) =>
-                          item.id === task.id
-                            ? { ...item, status: newStatus }
-                            : item
-                        )
-                      );
+                      updateTask(task.id, { status: newStatus });
                     }}
                     className={`cursor-pointer rounded-full border-0 px-3 py-1 text-xs font-medium outline-none ${task.status === "Completed"
                       ? "bg-emerald-500/10 text-emerald-400"
@@ -415,9 +360,7 @@ function Tasks() {
                           );
 
                           if (confirmDelete) {
-                            setTasks((prevTasks) =>
-                              prevTasks.filter((item) => item.id !== task.id)
-                            );
+                            deleteTask(task.id);
                           }
 
                           setOpenMenuId(null);
@@ -469,25 +412,10 @@ function Tasks() {
               };
 
               if (editingTask) {
-                setTasks((prevTasks) =>
-                  prevTasks.map((task) =>
-                    task.id === editingTask.id
-                      ? {
-                        ...task,
-                        ...formattedTask,
-                      }
-                      : task
-                  )
-                );
-
+                updateTask(editingTask.id, formattedTask);
                 setEditingTask(null);
               } else {
-                const task = {
-                  ...formattedTask,
-                  id: Date.now(),
-                };
-
-                setTasks((prevTasks) => [task, ...prevTasks]);
+                addTask(formattedTask);
               }
 
               setIsCreateTaskOpen(false);

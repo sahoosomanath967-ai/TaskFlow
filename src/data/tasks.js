@@ -1,0 +1,58 @@
+const initialTasks = [
+  {
+    id: 1,
+    title: "Build portfolio website",
+    project: "Personal Portfolio",
+    priority: "High",
+    status: "In Progress",
+    dueDate: "2026-09-08",
+    description: "",
+  },
+  {
+    id: 2,
+    title: "Complete React authentication",
+    project: "TaskFlow",
+    priority: "High",
+    status: "In Progress",
+    dueDate: "2026-09-10",
+    description: "",
+  },
+  {
+    id: 3,
+    title: "Design dashboard components",
+    project: "TaskFlow",
+    priority: "Medium",
+    status: "Completed",
+    dueDate: "2026-09-05",
+    description: "",
+  },
+  {
+    id: 4,
+    title: "Write project documentation",
+    project: "TaskFlow",
+    priority: "Low",
+    status: "Todo",
+    dueDate: "2026-09-12",
+    description: "",
+  },
+  {
+    id: 5,
+    title: "Create MongoDB database",
+    project: "TaskFlow",
+    priority: "High",
+    status: "Todo",
+    dueDate: "2026-09-14",
+    description: "",
+  },
+  {
+    id: 6,
+    title: "Build REST API",
+    project: "TaskFlow",
+    priority: "Medium",
+    status: "Todo",
+    dueDate: "2026-09-16",
+    description: "",
+  },
+];
+
+export default initialTasks;
